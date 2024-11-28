@@ -1,0 +1,12 @@
+/* app/assets/stylesheets/custom.css */
+.operation-buttons .btn {
+    margin: 5px;
+    padding: 10px;
+    font-size: 16px;
+    display: inline-block;
+    text-align: center;
+}
+
+.operation-buttons .btn i {
+    margin-right: 5px;
+}

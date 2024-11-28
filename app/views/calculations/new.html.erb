@@ -1,0 +1,72 @@
+<h1>Calculations</h1>
+
+<script>
+  document.addEventListener('turbo:load', () => {
+    function submitFormWithOperation(operation) {
+      const form = document.getElementById('calc-form');
+      const operationInput = document.getElementById('operation');
+      operationInput.value = operation;
+
+      const formData = new FormData(form);
+
+      fetch(form.action, {
+        method: form.method,
+        headers: {
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
+          'Accept': 'text/vnd.turbo-stream.html',
+        },
+        body: formData,
+      })
+      .then(response => response.text())
+      .then(html => Turbo.renderStreamMessage(html))
+      .catch(error => console.error('Error:', error));
+    }
+
+    document.querySelectorAll('.operation-btn').forEach(button => {
+      button.addEventListener('click', event => {
+        const operation = event.target.dataset.operation;
+        submitFormWithOperation(operation);
+      });
+    });
+  });
+</script>
+
+<%= form_with url: calculate_path, method: :post, id: 'calc-form' do %>
+  <div class="field">
+    <%= label_tag :a, "First Number" %>
+    <%= text_field_tag :a, params[:a] || '' %>
+  </div>
+
+  <div class="field">
+    <%= label_tag :b, "Second Number" %>
+    <%= text_field_tag :b, params[:b] || '' %>
+  </div>
+
+  <%= hidden_field_tag :operation, '', id: 'operation' %>
+
+  <div class="field">
+    <%= label_tag :operation, "Operation" %>
+    <div class="operation-buttons">
+      <button type="button" class="btn operation-btn" data-operation="add">
+        <i class="fas fa-plus"></i> Add
+      </button>
+      <button type="button" class="btn operation-btn" data-operation="subtract">
+        <i class="fas fa-minus"></i> Subtract
+      </button>
+      <button type="button" class="btn operation-btn" data-operation="multiply">
+        <i class="fas fa-times"></i> Multiply
+      </button>
+      <button type="button" class="btn operation-btn" data-operation="divide">
+        <i class="fas fa-divide"></i> Divide
+      </button>
+    </div>
+  </div>
+<% end %>
+
+<div id="result">
+  <% if @result.present? %>
+    <h2>Result: <%= @result %></h2>
+  <% else %>
+    <h2>Result not yet generated</h2>
+  <% end %>
+</div>
